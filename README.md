@@ -5,10 +5,14 @@
 ## Working with Submodules
 
 Clone the infrastructure repo with submodules
-```git clone --recursive https://github.com/yourusername/communikit-infrastructure.git```
+```
+git clone --recursive https://github.com/yourusername/communikit-infrastructure.git
+```
 
 If you already cloned without --recursive
-```git submodule update --init --recursive```
+```
+git submodule update --init --recursive
+```
 
 Update a specific submodule
 ```
@@ -19,4 +23,6 @@ git add base
 git commit -m "Update base application"
 ```
 Update all submodules to latest
-```git submodule update --remote --merge```
+```
+git submodule update --remote --merge
+```
