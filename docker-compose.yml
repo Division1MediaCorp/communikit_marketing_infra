@@ -1,0 +1,106 @@
+services:
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/traefik.yml:/traefik.yml:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - ./traefik/letsencrypt:/letsencrypt
+    networks:
+      - web
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  base-app:
+    build:
+      context: ./base
+      dockerfile: Dockerfile
+    container_name: communikit-base
+    restart: unless-stopped
+    expose:
+      - "3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.base.rule=Host(`communikit.com`)"
+      - "traefik.http.routers.base.tls=true"
+      - "traefik.http.routers.base.tls.certresolver=letsencrypt"
+      - "traefik.http.services.base.loadbalancer.server.port=3000"
+      - "traefik.http.routers.base.middlewares=security-headers,rate-limit"
+    networks:
+      - web
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./base/.env.production
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  fn-app:
+    build:
+      context: ./fn
+      dockerfile: Dockerfile
+    container_name: communikit-fn
+    restart: unless-stopped
+    expose:
+      - "3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fn.rule=Host(`indigenous.communikit.com`)"
+      - "traefik.http.routers.fn.tls=true"
+      - "traefik.http.routers.fn.tls.certresolver=letsencrypt"
+      - "traefik.http.services.fn.loadbalancer.server.port=3000"
+      - "traefik.http.routers.fn.middlewares=security-headers,rate-limit"
+    networks:
+      - web
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./fn/.env.production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  muni-app:
+    build:
+      context: ./muni
+      dockerfile: Dockerfile
+    container_name: communikit-muni
+    restart: unless-stopped
+    expose:
+      - "3000"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.muni.rule=Host(`municipalities.communikit.com`)"
+      - "traefik.http.routers.muni.tls=true"
+      - "traefik.http.routers.muni.tls.certresolver=letsencrypt"
+      - "traefik.http.services.muni.loadbalancer.server.port=3000"
+      - "traefik.http.routers.muni.middlewares=security-headers,rate-limit"
+    networks:
+      - web
+    environment:
+      - NODE_ENV=production
+    env_file:
+      - ./muni/.env.production
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  web:
+    external: true
+    

@@ -1,0 +1,9 @@
+[submodule "base"]
+	path = base
+	url = https://github.com/yourusername/communikit-base.git
+[submodule "fn"]
+	path = fn
+	url = https://github.com/yourusername/communikit-fn.git
+[submodule "muni"]
+	path = muni
+	url = https://github.com/yourusername/communikit-muni.git
